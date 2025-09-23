@@ -1,0 +1,12 @@
+{
+  "name": "intreview-task",
+  "version": "1.0.0",
+  "description": "This project implements a **multilingual Telegram chatbot** using [n8n](https://n8n.io/).   The bot: - Detects the user’s language. - Sends a translated restaurant-style menu (or English fallback). - Logs all conversations to Google Sheets (timestamp, user, message, response, language).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

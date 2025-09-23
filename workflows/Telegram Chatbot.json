@@ -153,7 +153,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer dfbfbbf177b07575d236a4c70cd44a42"
+              "value": "Bearer {{$env.DETECTLANGUAGE_API_KEY}}"
             }
           ]
         },
@@ -219,7 +219,7 @@
       "waitBetweenTries": 5000,
       "credentials": {
         "telegramApi": {
-          "id": "h1bA47AbGiCJBXsx",
+          "id": "={{ $env.TELEGRAM_BOT_TOKEN }}",
           "name": "Telegram account"
         }
       }
