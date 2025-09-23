@@ -1,0 +1,319 @@
+{
+  "name": "Telegram Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -464,
+        -32
+      ],
+      "id": "89e3f193-8973-4a6f-bc13-18e57fdb89e4",
+      "name": "Telegram Trigger",
+      "webhookId": "494f5947-6e14-4775-a94a-9059b81dc952",
+      "credentials": {
+        "telegramApi": {
+          "id": "={{ $env.TELEGRAM_BOT_TOKEN }}",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $env.GOOGLE_SHEET_ID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{$now}}",
+            "User ID": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"from\"][\"id\"]}}\n",
+            "Username": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"from\"][\"first_name\"]}} {{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"from\"][\"last_name\"]}}\n",
+            "Message": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"text\"]}}\n",
+            "Bot": "My ChatBot",
+            "Response": "={{$json[\"result\"][\"text\"]}}",
+            "Language": "={{ $item(0).$node[\"Detect language\"].json[\"data\"][\"detections\"]?.[0]?.[\"language\"]?.split(\"-\")[0] || \"error\" }}\n"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "User ID",
+              "displayName": "User ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Bot",
+              "displayName": "Bot",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Response",
+              "displayName": "Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Language",
+              "displayName": "Language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        -48
+      ],
+      "id": "9aa675fc-4432-49ba-bc47-bee26fdc9bb5",
+      "name": "Append row in sheet",
+      "retryOnFail": false,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Dpjz5CnsGiLz638a",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ws.detectlanguage.com/0.2/detect",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer dfbfbbf177b07575d236a4c70cd44a42"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"q\": \"{{$json[\"message\"][\"text\"]}}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -224,
+        -32
+      ],
+      "id": "8c5591da-d413-4b8f-8a23-ce094a728329",
+      "name": "Detect language",
+      "retryOnFail": false,
+      "maxTries": 2,
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "waitBetweenTries": 5000,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "url": "=https://lingva.ml/api/v1/en/{{$item(0).$node[\"Detect language\"].json[\"data\"][\"detections\"][0][\"language\"].split(\"-\")[0] || \"en\" }}\n/{{encodeURIComponent(\"Welcome! Here's our menu:\\n1. Pizza\\n2. Burger\\n3. Salad\\nPlease tell us your choice 😊\")}}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -32,
+        -32
+      ],
+      "id": "2ed487e8-fec1-4d68-8f45-7f65226f432d",
+      "name": "Translate Menu",
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}\n",
+        "text": "=You said: {{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"text\"]}}\nDetected language: {{$item(0).$node[\"Detect language\"].json[\"data\"][\"detections\"][0][\"language\"]}}\nReply: {{ $json[\"translation\"] }}\n",
+        "replyMarkup": "=none",
+        "forceReply": {},
+        "replyKeyboardOptions": {},
+        "replyKeyboardRemove": {},
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        -48
+      ],
+      "id": "d3dda8f4-def7-405d-837b-af26aadb1d7d",
+      "name": "Send a text (Translated)",
+      "webhookId": "62a08a4a-3210-4ca4-b05e-b2aa788d3f2c",
+      "retryOnFail": false,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "telegramApi": {
+          "id": "h1bA47AbGiCJBXsx",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://lingva.ml/api/v1/en/en/{{ encodeURIComponent(\"Sorry, we couldn't detect your language properly. Here’s the default menu in English:\\n1. Pizza\\n2. Burger\\n3. Salad\\nPlease tell us your choice 🍕🍔🥗\") }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        144,
+        112
+      ],
+      "id": "7f0ca4b6-0f6a-49d3-bbfe-11a2c25896a1",
+      "name": "Fallback Error Handling"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Detect language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect language": {
+      "main": [
+        [
+          {
+            "node": "Translate Menu",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Translate Menu": {
+      "main": [
+        [
+          {
+            "node": "Send a text (Translated)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fallback Error Handling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text (Translated)": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fallback Error Handling": {
+      "main": [
+        [
+          {
+            "node": "Send a text (Translated)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "f38858de-51e6-4c70-bfbf-339df941359e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b162c33ef12d73ab0acef807825a3e003d4ab8a7b1f390e79d71bc3d03496a78"
+  },
+  "id": "XBa6OCgnGzI9NHas",
+  "tags": []
+}
