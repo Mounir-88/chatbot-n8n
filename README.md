@@ -1,4 +1,4 @@
-# 🌍 Multilingual Telegram Chatbot with n8n
+# Multilingual Telegram Chatbot with n8n
 
 This project implements a **multilingual Telegram chatbot** using [n8n](https://n8n.io/).  
 The bot:
@@ -8,7 +8,7 @@ The bot:
 
 ---
 
-## 🚀 Setup Instructions (Local, with npm)
+## Setup Instructions (Local, with npm)
 
 ### 1. Install n8n globally
 ```bash
@@ -73,7 +73,7 @@ n8n
 ```
 
 n8n will now be available at:  
-👉 [http://localhost:5678](http://localhost:5678)
+[http://localhost:5678](http://localhost:5678)
 
 ---
 
@@ -86,7 +86,7 @@ n8n will now be available at:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 ```
 chatbot-n8n/
 ├── workflows/             # Exported n8n workflows (.json)
@@ -97,7 +97,7 @@ chatbot-n8n/
 
 ---
 
-## ✅ Features
+## Features
 - Multilingual support with automatic language detection.
 - Telegram integration (receive + send messages).
 - Logs interactions to Google Sheets:
@@ -110,14 +110,14 @@ chatbot-n8n/
 
 ---
 
-## ⚠️ Limitations
+## Limitations
 - Requires n8n to be running for the bot to respond.  
 - Cloudflare/ngrok tunnel must stay active for Telegram webhooks.  
 - Free Lingva translation API is used — not guaranteed for production use.  
 
 ---
 
-## 📌 Future Improvements
+## Future Improvements
 - Deploy permanently (Render, Railway, Fly.io, or n8n.cloud).  
 - Add WhatsApp support alongside Telegram.  
 - Extend conversation logic (order processing, FAQs, etc).  
