@@ -10,3 +10,18 @@ It detects the user’s language, translates responses, and logs all interaction
    git clone https://github.com/Mounir-88/chatbot-n8n.git
    cd chatbot-n8n
 
+2. Install dependencies:
+    ```bash
+    npm install
+
+3. Configure .env:
+
+    TELEGRAM_BOT_TOKEN=your-token
+    GOOGLE_SHEET_ID=your-sheet-id
+    PUBLIC_URL=https://your-tunnel.trycloudflare.com
+
+5. Run n8n locally:
+    ```bash
+    n8n
+
+
