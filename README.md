@@ -17,11 +17,12 @@ It detects the user’s language, translates responses, and logs all interaction
 3. Configure .env:
 
     TELEGRAM_BOT_TOKEN=your-token
-    GOOGLE_SHEET_ID=your-sheet-id
-    PUBLIC_URL=https://your-tunnel.trycloudflare.com
+>>  GOOGLE_SHEET_ID=your-sheet-id
+>>  PUBLIC_URL=https://your-tunnel.trycloudflare.com
 
 5. Run n8n locally:
     ```bash
-    n8n
+    $env:WEBHOOK_URL="PUBLIC_URL"
+>> n8n
 
 
