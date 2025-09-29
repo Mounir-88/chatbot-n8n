@@ -1,5 +1,5 @@
 {
-  "name": "Telegram Chatbot",
+  "name": "Telegram AI Chatbot",
   "nodes": [
     {
       "parameters": {
@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -464,
+        -400,
         -32
       ],
       "id": "89e3f193-8973-4a6f-bc13-18e57fdb89e4",
@@ -19,7 +19,7 @@
       "webhookId": "494f5947-6e14-4775-a94a-9059b81dc952",
       "credentials": {
         "telegramApi": {
-          "id": "={{ $env.TELEGRAM_BOT_TOKEN }}",
+          "id": "YOUR_API_KEY",
           "name": "Telegram account"
         }
       }
@@ -29,8 +29,8 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "={{ $env.GOOGLE_SHEET_ID }}",
-          "mode": "id"
+          "value": "YOUR_GOOGLE_SHEET_URL",
+          "mode": "url"
         },
         "sheetName": {
           "__rl": true,
@@ -43,9 +43,9 @@
             "Timestamp": "={{$now}}",
             "User ID": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"from\"][\"id\"]}}\n",
             "Username": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"from\"][\"first_name\"]}} {{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"from\"][\"last_name\"]}}\n",
-            "Message": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"text\"]}}\n",
+            "Message": "={{ $node['Telegram Trigger'].json['message']['text'] }}",
             "Bot": "My ChatBot",
-            "Response": "={{$json[\"result\"][\"text\"]}}",
+            "Response": "={{ \n  $json.error \n    ? \"Sorry, I wasn’t able to understand. Please try again.\"\n    : (\n        $json.candidates && $json.candidates[0] && $json.candidates[0].content &&\n        $json.candidates[0].content.parts && $json.candidates[0].content.parts[0] &&\n        $json.candidates[0].content.parts[0].text\n          ? $json.candidates[0].content.parts[0].text\n          : \"Sorry, I wasn’t able to understand. Please try again.\"\n      )\n}}\n",
             "Language": "={{ $item(0).$node[\"Detect language\"].json[\"data\"][\"detections\"]?.[0]?.[\"language\"]?.split(\"-\")[0] || \"error\" }}\n"
           },
           "matchingColumns": [],
@@ -129,8 +129,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        624,
-        -48
+        640,
+        -32
       ],
       "id": "9aa675fc-4432-49ba-bc47-bee26fdc9bb5",
       "name": "Append row in sheet",
@@ -139,10 +139,67 @@
       "waitBetweenTries": 5000,
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "Dpjz5CnsGiLz638a",
+          "id": "YOUR_API_KEY",
           "name": "Google Sheets account"
         }
       }
+    },
+    {
+      "parameters": {
+        "chatId": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}\n",
+        "text": "={{ \n  $json.error \n    ? \"Sorry, I wasn’t able to understand. Please try again.\"\n    : (\n        $json.candidates && $json.candidates[0] && $json.candidates[0].content &&\n        $json.candidates[0].content.parts && $json.candidates[0].content.parts[0] &&\n        $json.candidates[0].content.parts[0].text\n          ? $json.candidates[0].content.parts[0].text\n          : \"Sorry, I wasn’t able to understand. Please try again.\"\n      )\n}}\n",
+        "replyMarkup": "=none",
+        "forceReply": {},
+        "replyKeyboardOptions": {},
+        "replyKeyboardRemove": {},
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        -32
+      ],
+      "id": "d3dda8f4-def7-405d-837b-af26aadb1d7d",
+      "name": "Send a text",
+      "webhookId": "62a08a4a-3210-4ca4-b05e-b2aa788d3f2c",
+      "retryOnFail": false,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_API_KEY",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyBIqexDKiXABRghiz39KFdWxxH3FP1c8EU",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"{{ $node['Telegram Trigger'].json['message']['text'] }}\"\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"temperature\": 0.7,\n    \"maxOutputTokens\": 512\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        -32
+      ],
+      "id": "2c0b5f78-78b3-4bff-b5cd-d9025b63d755",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -153,7 +210,7 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "Bearer {{$env.DETECTLANGUAGE_API_KEY}}"
+              "value": "Bearer YOUR_API_KEY"
             }
           ]
         },
@@ -165,10 +222,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -224,
+        -144,
         -32
       ],
-      "id": "8c5591da-d413-4b8f-8a23-ce094a728329",
+      "id": "f527791d-a566-45f3-aaa9-97f37628a2b7",
       "name": "Detect language",
       "retryOnFail": false,
       "maxTries": 2,
@@ -176,67 +233,6 @@
       "executeOnce": false,
       "waitBetweenTries": 5000,
       "notesInFlow": false
-    },
-    {
-      "parameters": {
-        "url": "=https://lingva.ml/api/v1/en/{{$item(0).$node[\"Detect language\"].json[\"data\"][\"detections\"][0][\"language\"].split(\"-\")[0] || \"en\" }}\n/{{encodeURIComponent(\"Welcome! Here's our menu:\\n1. Pizza\\n2. Burger\\n3. Salad\\nPlease tell us your choice 😊\")}}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -32,
-        -32
-      ],
-      "id": "2ed487e8-fec1-4d68-8f45-7f65226f432d",
-      "name": "Translate Menu",
-      "retryOnFail": true,
-      "maxTries": 2,
-      "waitBetweenTries": 5000,
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "chatId": "={{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"chat\"][\"id\"]}}\n",
-        "text": "=You said: {{$item(0).$node[\"Telegram Trigger\"].json[\"message\"][\"text\"]}}\nDetected language: {{$item(0).$node[\"Detect language\"].json[\"data\"][\"detections\"][0][\"language\"]}}\nReply: {{ $json[\"translation\"] }}\n",
-        "replyMarkup": "=none",
-        "forceReply": {},
-        "replyKeyboardOptions": {},
-        "replyKeyboardRemove": {},
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        368,
-        -48
-      ],
-      "id": "d3dda8f4-def7-405d-837b-af26aadb1d7d",
-      "name": "Send a text (Translated)",
-      "webhookId": "62a08a4a-3210-4ca4-b05e-b2aa788d3f2c",
-      "retryOnFail": false,
-      "maxTries": 2,
-      "waitBetweenTries": 5000,
-      "credentials": {
-        "telegramApi": {
-          "id": "={{ $env.TELEGRAM_BOT_TOKEN }}",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "url": "=https://lingva.ml/api/v1/en/en/{{ encodeURIComponent(\"Sorry, we couldn't detect your language properly. Here’s the default menu in English:\\n1. Pizza\\n2. Burger\\n3. Salad\\nPlease tell us your choice 🍕🍔🥗\") }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        144,
-        112
-      ],
-      "id": "7f0ca4b6-0f6a-49d3-bbfe-11a2c25896a1",
-      "name": "Fallback Error Handling"
     }
   ],
   "pinData": {},
@@ -252,36 +248,7 @@
         ]
       ]
     },
-    "Detect language": {
-      "main": [
-        [
-          {
-            "node": "Translate Menu",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Translate Menu": {
-      "main": [
-        [
-          {
-            "node": "Send a text (Translated)",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Fallback Error Handling",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send a text (Translated)": {
+    "Send a text": {
       "main": [
         [
           {
@@ -292,24 +259,37 @@
         ]
       ]
     },
-    "Fallback Error Handling": {
+    "Detect language": {
       "main": [
         [
           {
-            "node": "Send a text (Translated)",
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
         ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
       ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1
   },
-  "versionId": "f38858de-51e6-4c70-bfbf-339df941359e",
+  "versionId": "8e8186f7-d4da-43fd-bb8e-d41ba4895fa3",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "b162c33ef12d73ab0acef807825a3e003d4ab8a7b1f390e79d71bc3d03496a78"

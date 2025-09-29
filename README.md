@@ -1,10 +1,10 @@
-# Multilingual Telegram Chatbot with n8n
+# Multilingual Telegram Chatbot with n8n + Google Gemini
 
-This project implements a **multilingual Telegram chatbot** using [n8n](https://n8n.io/).  
+This project implements a **multilingual Telegram chatbot** using [n8n](https://n8n.io/) and **Google Gemini API**.  
 The bot:
-- Detects the user’s language.
-- Sends a translated restaurant-style menu (or English fallback).
-- Logs all conversations to Google Sheets (timestamp, user, message, response, language).
+- Detects the user’s language.  
+- Responds intelligently in the same language using **Gemini AI**.  
+- Logs all conversations to Google Sheets (timestamp, user, message, response, language).  
 
 ---
 
@@ -37,13 +37,14 @@ Create a file called `.env` in the project root and add:
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 GOOGLE_SHEET_ID=your-google-sheet-id
 PUBLIC_URL=https://your-tunnel.trycloudflare.com
+GEMINI_API_KEY=your-gemini-api-key
 ```
 
 - **TELEGRAM_BOT_TOKEN** → from [@BotFather](https://t.me/botfather).  
 - **GOOGLE_SHEET_ID** → the ID part of your Google Sheet URL:  
   `https://docs.google.com/spreadsheets/d/<THIS_PART>/edit#gid=0`  
-- **PUBLIC_URL** → a public HTTPS URL (from Cloudflare Tunnel, ngrok, etc).  
-
+- **PUBLIC_URL** → a public HTTPS URL (from Cloudflare Tunnel, ngrok, etc).
+- **GEMINI_API_KEY** → get one from [Google AI Studio](https://aistudio.google.com)
 ---
 
 ### 4. Start a public tunnel
@@ -82,7 +83,8 @@ n8n will now be available at:
 2. Click **Import** → upload `workflows/telegram-chatbot.json`.  
 3. Add **Telegram API** credentials (Bot token).  
 4. Add **Google Sheets** credentials (OAuth2).  
-5. Activate the workflow.
+5. Add **Gemini API** credentials (GEMINI_API_KEY).
+6. Activate the workflow.
 
 ---
 
@@ -99,6 +101,7 @@ chatbot-n8n/
 
 ## Features
 - Multilingual support with automatic language detection.
+- Gemini AI integration for **intelligent, context-aware responses**.
 - Telegram integration (receive + send messages).
 - Logs interactions to Google Sheets:
   - Timestamp
@@ -106,14 +109,14 @@ chatbot-n8n/
   - User Message
   - Bot Response
   - Language Detected
-- Error handling with fallback to English.
+- General error handling: fallback message ("Sorry, I wasn’t able to understand. Please try again.").
 
 ---
 
 ## Limitations
 - Requires n8n to be running for the bot to respond.  
 - Cloudflare/ngrok tunnel must stay active for Telegram webhooks.  
-- Free Lingva translation API is used — not guaranteed for production use.  
+- Free Gemini quota may be limited; check [Google AI Studio](https://aistudio.google.com) for usage.  
 
 ---
 
